@@ -1,10 +1,14 @@
-export default function PartCard({ part }) {
+const PartCard = ({ part, onSelect }) => {
   return (
-    <div className="bg-white shadow-md rounded-lg p-4">
-      <img src={part.imageUrl} alt={part.name} className="h-32 w-full object-contain" />
-      <h3 className="text-lg font-semibold">{part.name}</h3>
-      <p className="text-gray-600">Price: ${part.price}</p>
-      <button className="mt-2 bg-purple-500 text-white px-4 py-2 rounded">Select</button>
+    <div className="border p-4 rounded-lg shadow">
+      <img src={part.imageUrl} alt={part.name} className="w-full h-32 object-cover mb-2" />
+      <h3 className="font-bold">{part.name}</h3>
+      <p>Price: ${part.price}</p>
+      <button onClick={onSelect} className="mt-2 bg-purple-500 text-white px-4 py-2 rounded">
+        Select
+      </button>
     </div>
   );
-}
+};
+
+export default PartCard;

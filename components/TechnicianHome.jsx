@@ -1,4 +1,4 @@
-const TechnicianView = () => {
+const TechnicianHome = () => {
     return (
       <div>
         <h2 className="text-xl font-semibold mb-4">Current Orders</h2>
@@ -37,4 +37,4 @@ const TechnicianView = () => {
     );
   };
   
-  export default TechnicianView;
+  export default TechnicianHome;

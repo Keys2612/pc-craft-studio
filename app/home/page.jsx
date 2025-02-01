@@ -45,37 +45,16 @@
 // }
 
 
-"use client";
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+// "use client";
 
-export default function HomePage() {
-  const router = useRouter();
+// // import { redirect } from 'next/navigation';
 
-  useEffect(() => {
-    // Retrieve the role from localStorage
-    const role = localStorage.getItem("userRole");
-
-    // Redirect to login if no role is found (user not logged in)
-    if (!role) {
-      router.push("/login"); // Redirect to login page
-    } else {
-      // Redirect based on role
-      if (role === "customer") {
-        router.push("/"); // Redirect to customer page
-      } else if (role === "technician") {
-        router.push("/technician"); // Redirect to technician page
-      } else if (role === "admin") {
-        router.push("/admin"); // Redirect to admin page
-      }
-    }
-  }, [router]);
-
-  return null; // This page is just for redirection
-}
+// // export default function HomePage() {
+// //   redirect('/login');
+// // }
 // import { useState, useEffect } from "react";
-// import Sidebar from "../components/Sidebar";
-// import PartCard from "../components/PartCard";
+// import Sidebar from "../../components/Sidebar";
+// import PartCard from "../../components/PartCard";
 
 
 
@@ -130,3 +109,30 @@ export default function HomePage() {
 //     </div>
 //   );
 // }
+
+
+"use client";
+import { useState, useEffect } from "react";
+import CustomerHome from "../../components/CustomerHome";
+import TechnicianHome from "../../components/TechnicianHome";
+import AdminHome from "../../components/AdminHome";
+
+export default function HomePage() {
+  const [role, setRole] = useState(null);
+
+  useEffect(() => {
+    // Simulating role retrieval (Replace this with actual authentication logic)
+    const userRole = localStorage.getItem("userRole") || "customer"; 
+    setRole(userRole);
+  }, []);
+
+  if (!role) return <div>Loading...</div>;
+
+  return (
+    <div>
+      {role === "customer" && <CustomerHome />}
+      {role === "technician" && <TechnicianHome />}
+      {role === "admin" && <AdminHome />}
+    </div>
+  );
+}

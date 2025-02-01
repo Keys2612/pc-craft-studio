@@ -1,22 +1,39 @@
-// components/Sidebar.jsx
 "use client";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 
-const Sidebar = () => {
+const Sidebar = ({ setCategory, setSelectedBuild }) => {
   const pathname = usePathname();
-  const [role, setRole] = useState("customer"); // Change this to "technician" to test
+  const [activeItem, setActiveItem] = useState(
+    pathname === "/home" ? "All" : "Build Summary"
+  );
+
+  const handleCategoryClick = (category) => {
+    if (setCategory) setCategory(category);
+    setActiveItem(category);
+  };
+
+  const handleBuildClick = (buildSection) => {
+    if (setSelectedBuild) setSelectedBuild(buildSection);
+    setActiveItem(buildSection);
+  };
 
   const getSidebarContent = () => {
-    if (pathname === "/") {
+    if (pathname === "/home") {
       return (
         <ul className="space-y-3">
           <li className="font-bold">Categories</li>
-          <li className="cursor-pointer hover:underline">All</li>
-          <li className="cursor-pointer hover:underline">Storage</li>
-          <li className="cursor-pointer hover:underline">Graphics Cards</li>
-          <li className="cursor-pointer hover:underline">Processors</li>
-          <li className="cursor-pointer hover:underline">Memory</li>
+          {["All", "Storage", "Graphics Cards", "Processors", "Memory"].map((category) => (
+            <li
+              key={category}
+              className={`cursor-pointer px-3 py-2 rounded-lg ${
+                activeItem === category ? "bg-blue-500 text-white" : "text-gray-700 hover:bg-gray-200"
+              }`}
+              onClick={() => handleCategoryClick(category)}
+            >
+              {category}
+            </li>
+          ))}
         </ul>
       );
     }
@@ -24,10 +41,18 @@ const Sidebar = () => {
     if (pathname === "/my-builds") {
       return (
         <ul className="space-y-3">
-          <li className="font-bold">{role === "technician" ? "Technician Panel" : "My Builds"}</li>
-          <li className="cursor-pointer hover:underline">Build Summary</li>
-          <li className="cursor-pointer hover:underline">Current Orders</li>
-          <li className="cursor-pointer hover:underline">Order History</li>
+          <li className="font-bold">My Builds</li>
+          {["Build Summary", "Current Orders", "Order History"].map((build) => (
+            <li
+              key={build}
+              className={`cursor-pointer px-3 py-2 rounded-lg ${
+                activeItem === build ? "bg-blue-500 text-white" : "text-gray-700 hover:bg-gray-200"
+              }`}
+              onClick={() => handleBuildClick(build)}
+            >
+              {build}
+            </li>
+          ))}
         </ul>
       );
     }
@@ -43,4 +68,3 @@ const Sidebar = () => {
 };
 
 export default Sidebar;
-  

@@ -1,103 +1,108 @@
-// app/my-builds/page.jsx
 "use client";
 import { useState } from "react";
+import { useParts } from "@/context/PartsContext";
+import { useRouter } from "next/navigation";
 import Sidebar from "@/components/Sidebar";
-// import Header from "@/components/Header";
 
 const MyBuilds = () => {
-  const [role, setRole] = useState("customer"); // Change to "technician" to test
+  const { selectedParts, updateQuantity, removePart } = useParts();
+  const [selectedBuild, setSelectedBuild] = useState("Build Summary");
+  const router = useRouter();
 
-  // Sample build parts (Customer)
-  const buildParts = [
-    { name: "NVIDIA 10GB GDDR6X", price: "$699.99", image: "/gpu.jpg" },
-    { name: "CPU: Intel Core", price: "$529.99", image: "/cpu.jpg" },
-  ];
+  const handleCheckout = () => {
+    router.push("/my-builds/checkout");
+  };
 
-  // Sample orders (Technician)
-  const orders = [
-    { id: "12345", parts: "CPU, Motherboard, RAM", status: "Complete" },
-    { id: "12346", parts: "Graphics Card, PSU", status: "In Progress" },
-    { id: "12347", parts: "SSD, Cooling Fan", status: "Pending" },
-    { id: "12348", parts: "SSD, Cooling Fan", status: "Rejected" },
-  ];
+  const renderContent = () => {
+    switch (selectedBuild) {
+      case "Build Summary":
+        return (
+          <>
+            <div className="flex">
+              <div className="w-2/3 p-4">
+                <h2 className="text-2xl font-bold mb-4">Build Parts</h2>
+                {selectedParts.length === 0 ? (
+                  <p>No parts selected yet.</p>
+                ) : (
+                  selectedParts.map((part, index) => (
+                    <div key={index} className="flex items-center border p-4 mb-4 rounded-lg shadow">
+                      <img src={part.imageUrl} alt={part.name} className="w-24 h-24 object-cover rounded" />
+                      <div className="ml-4 flex-1">
+                        <h3 className="font-bold">{part.name}</h3>
+                        <p>${part.price.toFixed(2)}</p>
 
-  return (
-    <div className="flex flex-col min-h-screen">
+                        {/* Quantity Controls */}
+                        <div className="flex items-center mt-2">
+                          <button
+                            onClick={() => updateQuantity(part.id, part.quantity - 1)}
+                            className="bg-gray-300 px-2 py-1 rounded"
+                            disabled={part.quantity <= 1}
+                          >
+                            -
+                          </button>
+                          <span className="mx-2">{part.quantity}</span>
+                          <button
+                            onClick={() => updateQuantity(part.id, part.quantity + 1)}
+                            className="bg-gray-300 px-2 py-1 rounded"
+                          >
+                            +
+                          </button>
+                        </div>
+                      </div>
 
-      <div className="flex flex-1">
-        <Sidebar />
-        <main className="flex-1 p-6">
-          {role === "customer" ? (
-            <>
-              <h1 className="text-2xl font-bold mb-4">Build Parts</h1>
-              <div className="space-y-4">
-                {buildParts.map((part, index) => (
-                  <div key={index} className="flex items-center border p-4 rounded-lg shadow-md">
-                    <img src={part.image} alt={part.name} className="w-16 h-16 object-cover rounded-md mr-4" />
-                    <div className="flex-1">
-                      <h2 className="font-semibold">{part.name}</h2>
-                      <p className="text-gray-600">{part.price}</p>
+                      <button
+                        onClick={() => removePart(part.id)}
+                        className="ml-auto bg-red-500 text-white px-4 py-2 rounded"
+                      >
+                        Delete
+                      </button>
                     </div>
-                    <button className="bg-red-500 text-white px-4 py-2 rounded">Delete</button>
-                  </div>
-                ))}
+                  ))
+                )}
               </div>
 
               {/* Summary Section */}
-              <div className="mt-6 p-4 border rounded-lg shadow-md w-1/3">
-                <h2 className="font-bold">Summary</h2>
-                <p>Parts Total: <span className="font-semibold">$1229.9</span></p>
-                <p>Custom Build Fee: <span className="font-semibold">$20.0</span></p>
-                <hr className="my-2" />
-                <p className="text-lg font-bold">Total: <span>$1249.9</span></p>
-                <button className="bg-green-500 text-white w-full py-2 mt-2 rounded">Proceed to Checkout</button>
+              <div className="w-1/3 p-4 bg-white shadow rounded-lg">
+                <h3 className="font-bold text-xl">Summary</h3>
+                <p>
+                  Parts Total: $
+                  {selectedParts
+                    .reduce((sum, part) => sum + part.price * part.quantity, 0)
+                    .toFixed(2)}
+                </p>
+                <p>Custom Build Fee: $20.00</p>
+                <h3 className="font-bold text-lg">
+                  Total: $
+                  {(
+                    selectedParts.reduce((sum, part) => sum + part.price * part.quantity, 20)
+                  ).toFixed(2)}
+                </h3>
+                <button
+                  onClick={handleCheckout}
+                  className="mt-4 bg-green-500 text-white px-4 py-2 rounded w-full"
+                >
+                  Proceed to Checkout
+                </button>
               </div>
-            </>
-          ) : (
-            <>
-              <h1 className="text-2xl font-bold mb-4">Current Orders</h1>
-              <table className="w-full border-collapse border">
-                <thead>
-                  <tr className="bg-gray-200">
-                    <th className="p-2 border">Order</th>
-                    <th className="p-2 border">Parts</th>
-                    <th className="p-2 border">Status</th>
-                    <th className="p-2 border">Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {orders.map((order, index) => (
-                    <tr key={index} className="text-center border">
-                      <td className="p-2 border">#{order.id}</td>
-                      <td className="p-2 border">{order.parts}</td>
-                      <td className="p-2 border">
-                        <span className={
-                          order.status === "Complete" ? "text-green-500" :
-                          order.status === "In Progress" ? "text-yellow-500" :
-                          order.status === "Pending" ? "text-orange-500" :
-                          "text-red-500"
-                        }>
-                          {order.status}
-                        </span>
-                      </td>
-                      <td className="p-2 border">
-                        {order.status === "Pending" ? (
-                          <button className="bg-red-500 text-white px-4 py-1 rounded">Cancel</button>
-                        ) : (
-                          <button className="bg-purple-500 text-white px-4 py-1 rounded">View</button>
-                        )}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </>
-          )}
-        </main>
-      </div>
-      <footer className="text-center py-4 text-gray-500">
-        © 2024 PC Craft Studio. All rights reserved.
-      </footer>
+            </div>
+          </>
+        );
+
+      case "Current Orders":
+        return <p>🛒 These are your Current Orders.</p>;
+
+      case "Order History":
+        return <p>📜 This is your Order History.</p>;
+
+      default:
+        return <p>No selection.</p>;
+    }
+  };
+
+  return (
+    <div className="flex">
+      <Sidebar setSelectedBuild={setSelectedBuild} />
+      <div className="flex-1 p-6">{renderContent()}</div>
     </div>
   );
 };
