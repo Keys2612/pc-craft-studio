@@ -1,71 +1,97 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation"; // Import Next.js router
 
-export default function AdminHome() {
-  const [search, setSearch] = useState("");
-  const [parts, setParts] = useState([
-    { id: 1, name: "Ryzen 5 3600", category: "CPU", price: 199.99 },
-    { id: 2, name: "GTX 1660 Super", category: "Graphics Card", price: 229.99 },
-    { id: 3, name: "Corsair Vengeance LPX", category: "RAM", price: 79.99 },
-  ]);
+// Dummy data
+const dummyOverview = {
+  totalOrders: 120,
+  pendingOrders: 5,
+  registeredUsers: 50,
+  availableParts: 200,
+};
 
-  const handleDelete = (id) => {
-    setParts(parts.filter((part) => part.id !== id));
-  };
+const dummyRecentActivity = [
+  { id: 1, message: "User JohnDoe registered", timestamp: "2025-02-01 10:00" },
+  { id: 2, message: "Order #1234 placed", timestamp: "2025-02-01 09:00" },
+  { id: 3, message: "Part 'NVIDIA RTX 3080' added", timestamp: "2025-01-31 16:00" },
+];
 
-  const filteredParts = parts.filter((part) =>
-    part.name.toLowerCase().includes(search.toLowerCase())
-  );
+const AdminHome = () => {
+  const [overview, setOverview] = useState({});
+  const [recentActivity, setRecentActivity] = useState([]);
+  const router = useRouter(); // Initialize router
+
+  useEffect(() => {
+    // Simulating API calls
+    setOverview(dummyOverview);
+    setRecentActivity(dummyRecentActivity);
+  }, []);
 
   return (
     <div className="p-6">
-      <h2 className="text-2xl font-bold mb-4">Available Parts</h2>
+      <h1 className="text-3xl font-bold mb-4">Admin Dashboard</h1>
 
-      <div className="flex justify-end mb-4">
-        <input
-          type="text"
-          placeholder="Search"
-          className="border px-3 py-2 rounded"
-          onChange={(e) => setSearch(e.target.value)}
-        />
+      {/* Overview Cards */}
+      <div className="grid grid-cols-4 gap-4 mb-8">
+        <div className="bg-white p-6 rounded-lg shadow">
+          <h3 className="text-xl font-bold">Total Orders</h3>
+          <p className="text-2xl">{overview.totalOrders}</p>
+        </div>
+        <div className="bg-white p-6 rounded-lg shadow">
+          <h3 className="text-xl font-bold">Pending Orders</h3>
+          <p className="text-2xl">{overview.pendingOrders}</p>
+        </div>
+        <div className="bg-white p-6 rounded-lg shadow">
+          <h3 className="text-xl font-bold">Registered Users</h3>
+          <p className="text-2xl">{overview.registeredUsers}</p>
+        </div>
+        <div className="bg-white p-6 rounded-lg shadow">
+          <h3 className="text-xl font-bold">Available Parts</h3>
+          <p className="text-2xl">{overview.availableParts}</p>
+        </div>
       </div>
 
-      <div className="bg-white shadow-md rounded-lg overflow-hidden">
-        <table className="w-full border-collapse">
-          <thead className="bg-gray-200">
-            <tr>
-              <th className="p-3 text-left">Name</th>
-              <th className="p-3 text-left">Category</th>
-              <th className="p-3 text-left">Price</th>
-              <th className="p-3 text-left">Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredParts.map((part) => (
-              <tr key={part.id} className="border-b">
-                <td className="p-3">{part.name}</td>
-                <td className="p-3">{part.category}</td>
-                <td className="p-3">${part.price.toFixed(2)}</td>
-                <td className="p-3 flex gap-2">
-                  <button className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600">
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => handleDelete(part.id)}
-                    className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
-                  >
-                    Delete
-                  </button>
-                </td>
-              </tr>
+      {/* Recent Activity */}
+      <div className="mb-8">
+        <h2 className="text-2xl font-bold mb-4">Recent Activity</h2>
+        <div className="bg-white p-4 rounded-lg shadow">
+          <ul>
+            {recentActivity.map((activity) => (
+              <li key={activity.id} className="mb-2">
+                <p>{activity.message}</p>
+                <span className="text-gray-500 text-sm">{activity.timestamp}</span>
+              </li>
             ))}
-          </tbody>
-        </table>
+          </ul>
+        </div>
       </div>
 
-      <footer className="text-center text-gray-500 text-sm mt-6">
-        © 2024 PC Craft Studio. All rights reserved.
-      </footer>
+      {/* Quick Actions (Moved to Bottom) */}
+      <div className="bg-white p-6 rounded-lg shadow mt-8">
+        <h2 className="text-2xl font-bold mb-4">Quick Actions</h2>
+        <div className="space-x-4">
+          <button
+            className="bg-blue-500 text-white px-4 py-2 rounded"
+            onClick={() => router.push("/parts-management")}
+          >
+            Manage Parts
+          </button>
+          <button
+            className="bg-green-500 text-white px-4 py-2 rounded"
+            onClick={() => router.push("/orders")}
+          >
+            View Orders
+          </button>
+          <button
+            className="bg-purple-500 text-white px-4 py-2 rounded"
+            onClick={() => router.push("/users")}
+          >
+            Manage Users
+          </button>
+        </div>
+      </div>
     </div>
   );
-}
+};
+
+export default AdminHome;

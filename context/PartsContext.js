@@ -7,6 +7,7 @@ const PartsContext = createContext();
 // Context Provider
 export const PartsProvider = ({ children }) => {
   const [selectedParts, setSelectedParts] = useState([]);
+  const [currentOrders, setCurrentOrders] = useState([]); // ✅ Store confirmed orders
 
   const addPart = (part) => {
     setSelectedParts((prevParts) => {
@@ -33,8 +34,25 @@ export const PartsProvider = ({ children }) => {
     setSelectedParts((prevParts) => prevParts.filter((part) => part.id !== id));
   };
 
+  // ✅ Confirm Order Function
+  const confirmOrder = () => {
+    if (selectedParts.length === 0) return;
+
+    const newOrder = {
+      id: `#${Math.floor(10000 + Math.random() * 90000)}`, // Random order ID
+      parts: selectedParts.map((p) => p.name).join(", "),
+      status: "Pending", // Initial status
+      action: "Cancel",
+    };
+
+    setCurrentOrders((prevOrders) => [newOrder, ...prevOrders]); // Add to orders
+    setSelectedParts([]); // ✅ Clear cart after confirming
+  };
+
   return (
-    <PartsContext.Provider value={{ selectedParts, addPart, updateQuantity, removePart }}>
+    <PartsContext.Provider
+      value={{ selectedParts, addPart, updateQuantity, removePart, confirmOrder, currentOrders }}
+    >
       {children}
     </PartsContext.Provider>
   );
