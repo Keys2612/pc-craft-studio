@@ -68,3 +68,87 @@ const Sidebar = ({ setCategory, setSelectedBuild }) => {
 };
 
 export default Sidebar;
+
+// "use client";
+// import { usePathname } from "next/navigation";
+// import { useState } from "react";
+
+// const Sidebar = ({ setCategory, setSelectedBuild, userType }) => {
+//   const pathname = usePathname();
+//   const [activeItem, setActiveItem] = useState("");
+
+//   const handleItemClick = (item, setter) => {
+//     if (setter) setter(item);
+//     setActiveItem(item);
+//   };
+
+//   const getSidebarContent = () => {
+//     if (role === "customer") {
+//       if (pathname === "/home") {
+//         // Customer Sidebar on /home
+//         return (
+//           <ul className="space-y-3">
+//             <li className="font-bold">Categories</li>
+//             {["All", "Storage", "Graphics Cards", "Processors", "Memory"].map((category) => (
+//               <li
+//                 key={category}
+//                 className={`cursor-pointer px-3 py-2 rounded-lg ${
+//                   activeItem === category ? "bg-blue-500 text-white" : "text-gray-700 hover:bg-gray-200"
+//                 }`}
+//                 onClick={() => handleItemClick(category, setCategory)}
+//               >
+//                 {category}
+//               </li>
+//             ))}
+//           </ul>
+//         );
+//       }
+
+//       if (pathname === "/my-builds") {
+//         // Customer Sidebar on /my-builds
+//         return (
+//           <ul className="space-y-3">
+//             <li className="font-bold">My Builds</li>
+//             {["Build Summary", "Current Orders", "Order History"].map((build) => (
+//               <li
+//                 key={build}
+//                 className={`cursor-pointer px-3 py-2 rounded-lg ${
+//                   activeItem === build ? "bg-blue-500 text-white" : "text-gray-700 hover:bg-gray-200"
+//                 }`}
+//                 onClick={() => handleItemClick(build, setSelectedBuild)}
+//               >
+//                 {build}
+//               </li>
+//             ))}
+//           </ul>
+//         );
+//       }
+//     }
+
+//     if (role === "technician") {
+//       // Technician Sidebar (same for all routes)
+//       return (
+//         <ul className="space-y-3">
+//           <li className="font-bold">My Builds</li>
+//           {["Available Orders", "Current Build", "Build History"].map((build) => (
+//             <li
+//               key={build}
+//               className={`cursor-pointer px-3 py-2 rounded-lg ${
+//                 activeItem === build ? "bg-blue-500 text-white" : "text-gray-700 hover:bg-gray-200"
+//               }`}
+//               onClick={() => handleItemClick(build, setSelectedBuild)}
+//             >
+//               {build}
+//             </li>
+//           ))}
+//         </ul>
+//       );
+//     }
+
+//     return <p className="font-bold">Other Page Content</p>;
+//   };
+
+//   return <aside className="w-1/4 p-4 bg-gray-100 h-screen">{getSidebarContent()}</aside>;
+// };
+
+// export default Sidebar;

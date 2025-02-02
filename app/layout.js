@@ -14,13 +14,13 @@ export default function RootLayout({ children }) {
       <body className="flex flex-col min-h-screen">
         <PartsProvider>
           {/* Show Header only if not on login page */}
-          {pathname !== "/login" && <Header />}
+          {pathname !== "/" && <Header />}
 
           {/* Main content */}
           <main className="flex-grow container mx-auto p-4">{children}</main>
 
           {/* Show Footer only if not on login page */}
-          {pathname !== "/login" && <Footer />}
+          {pathname !== "/" && <Footer />}
         </PartsProvider>
       </body>
     </html>
