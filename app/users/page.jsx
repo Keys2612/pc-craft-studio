@@ -7,7 +7,6 @@ const dummyUsers = [
     name: "John Doe",
     email: "john@example.com",
     role: "Admin",
-    status: "Active",
     profilePic: "https://randomuser.me/api/portraits/men/1.jpg",
   },
   {
@@ -15,7 +14,6 @@ const dummyUsers = [
     name: "Jane Smith",
     email: "jane@example.com",
     role: "Customer",
-    status: "Inactive",
     profilePic: "https://randomuser.me/api/portraits/women/2.jpg",
   },
   {
@@ -23,7 +21,6 @@ const dummyUsers = [
     name: "Mike Johnson",
     email: "mike@example.com",
     role: "Technician",
-    status: "Active",
     profilePic: "https://randomuser.me/api/portraits/men/3.jpg",
   },
 ];
@@ -33,11 +30,11 @@ const UsersPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [roleFilter, setRoleFilter] = useState("All");
   const [showModal, setShowModal] = useState(false);
+  const [editUser, setEditUser] = useState(null);
   const [newUser, setNewUser] = useState({
     name: "",
     email: "",
     role: "Customer",
-    status: "Active",
   });
 
   useEffect(() => {
@@ -63,14 +60,24 @@ const UsersPage = () => {
     setUsers(users.filter((user) => user.id !== id));
   };
 
-  const handleAddUser = () => {
-    const newUserData = {
-      id: users.length + 1,
-      ...newUser,
-      profilePic: "https://randomuser.me/api/portraits/men/4.jpg",
-    };
-    setUsers([...users, newUserData]);
+  const handleEdit = (user) => {
+    setEditUser(user);
+    setShowModal(true);
+  };
+
+  const handleSaveUser = () => {
+    if (editUser) {
+      setUsers(users.map((user) => (user.id === editUser.id ? editUser : user)));
+    } else {
+      const newUserData = {
+        id: users.length + 1,
+        ...newUser,
+        profilePic: "https://randomuser.me/api/portraits/men/4.jpg",
+      };
+      setUsers([...users, newUserData]);
+    }
     setShowModal(false);
+    setEditUser(null);
   };
 
   return (
@@ -99,29 +106,29 @@ const UsersPage = () => {
 
       {/* Users Table */}
       <div className="bg-white p-6 rounded-lg shadow">
-        <table className="w-full border-collapse">
+        <table className="w-full border-collapse table-fixed">
           <thead>
             <tr className="bg-gray-200">
-              <th className="p-2">Profile</th>
-              <th className="p-2">Name</th>
-              <th className="p-2">Email</th>
-              <th className="p-2">Role</th>
-              <th className="p-2">Status</th>
-              <th className="p-2">Actions</th>
+              <th className="p-2 w-1/6">Profile</th>
+              <th className="p-2 w-1/4">Name</th>
+              <th className="p-2 w-1/4">Email</th>
+              <th className="p-2 w-1/6">Role</th>
+              <th className="p-2 w-1/6">Actions</th>
             </tr>
           </thead>
           <tbody>
             {filteredUsers.map((user) => (
-              <tr key={user.id} className="border-t">
+              <tr key={user.id} className="border-t text-center">
                 <td className="p-2">
-                  <img src={user.profilePic} alt="Profile" className="w-10 h-10 rounded-full" />
+                  <img src={user.profilePic} alt="Profile" className="w-10 h-10 rounded-full mx-auto" />
                 </td>
                 <td className="p-2">{user.name}</td>
                 <td className="p-2">{user.email}</td>
                 <td className="p-2">{user.role}</td>
-                <td className="p-2">{user.status}</td>
                 <td className="p-2 space-x-2">
-                  <button className="bg-yellow-500 text-white px-3 py-1 rounded">Edit</button>
+                  <button className="bg-yellow-500 text-white px-3 py-1 rounded" onClick={() => handleEdit(user)}>
+                    Edit
+                  </button>
                   <button className="bg-red-500 text-white px-3 py-1 rounded" onClick={() => handleDelete(user.id)}>
                     Delete
                   </button>
@@ -132,18 +139,22 @@ const UsersPage = () => {
         </table>
       </div>
 
-      {/* Add User Modal */}
+
+      
+      {/* Add/Edit User Modal */}
       {showModal && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-white p-6 rounded-lg shadow-lg w-96">
-            <h2 className="text-2xl font-bold mb-4">Add New User</h2>
+            <h2 className="text-2xl font-bold mb-4">{editUser ? "Edit User" : "Add New User"}</h2>
             <div className="mb-2">
               <label className="block font-medium">Name</label>
               <input
                 type="text"
                 className="w-full border p-2 rounded"
-                value={newUser.name}
-                onChange={(e) => setNewUser({ ...newUser, name: e.target.value })}
+                value={editUser ? editUser.name : newUser.name}
+                onChange={(e) =>
+                  editUser ? setEditUser({ ...editUser, name: e.target.value }) : setNewUser({ ...newUser, name: e.target.value })
+                }
               />
             </div>
             <div className="mb-2">
@@ -151,39 +162,18 @@ const UsersPage = () => {
               <input
                 type="email"
                 className="w-full border p-2 rounded"
-                value={newUser.email}
-                onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
+                value={editUser ? editUser.email : newUser.email}
+                onChange={(e) =>
+                  editUser ? setEditUser({ ...editUser, email: e.target.value }) : setNewUser({ ...newUser, email: e.target.value })
+                }
               />
-            </div>
-            <div className="mb-2">
-              <label className="block font-medium">Role</label>
-              <select
-                className="w-full border p-2 rounded"
-                value={newUser.role}
-                onChange={(e) => setNewUser({ ...newUser, role: e.target.value })}
-              >
-                <option value="Customer">Customer</option>
-                <option value="Technician">Technician</option>
-                <option value="Admin">Admin</option>
-              </select>
-            </div>
-            <div className="mb-2">
-              <label className="block font-medium">Status</label>
-              <select
-                className="w-full border p-2 rounded"
-                value={newUser.status}
-                onChange={(e) => setNewUser({ ...newUser, status: e.target.value })}
-              >
-                <option value="Active">Active</option>
-                <option value="Inactive">Inactive</option>
-              </select>
             </div>
             <div className="flex justify-end space-x-2 mt-4">
               <button className="bg-gray-500 text-white px-4 py-2 rounded" onClick={() => setShowModal(false)}>
                 Cancel
               </button>
-              <button className="bg-green-500 text-white px-4 py-2 rounded" onClick={handleAddUser}>
-                Add User
+              <button className="bg-green-500 text-white px-4 py-2 rounded" onClick={handleSaveUser}>
+                Save
               </button>
             </div>
           </div>
