@@ -6,7 +6,7 @@ import TechnicianBuildHistory from "@/components/TechnicianBuildHistory";
 import { useParts } from "@/context/PartsContext"; // Import context
 
 const TechnicianHome = () => {
-  const { currentOrders } = useParts(); // Use context to access currentOrders
+  const { currentOrders, currentBuild } = useParts(); // Access context data
   const [selectedTab, setSelectedTab] = useState("Available Orders");
 
   return (
@@ -35,7 +35,7 @@ const TechnicianHome = () => {
           {selectedTab === "Available Orders" && (
             <TechnicianOrders orders={currentOrders} /> // Pass currentOrders as props
           )}
-          {selectedTab === "Current Build" && <TechnicianCurrentBuild />}
+          {selectedTab === "Current Build" && <TechnicianCurrentBuild order={currentBuild} />} {/* Show the current build */}
           {selectedTab === "Build History" && <TechnicianBuildHistory />}
         </main>
       </div>
