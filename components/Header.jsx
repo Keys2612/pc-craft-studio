@@ -2,28 +2,34 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import LogoutModal from "./LogoutModal"; // Import the modal
 
 const Header = () => {
   const [role, setRole] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false); // State for modal visibility
   const router = useRouter();
 
   useEffect(() => {
-    // Retrieve user role from localStorage (or replace with real auth logic)
     const userRole = localStorage.getItem("userRole");
     setRole(userRole);
   }, []);
 
   const handleLogout = () => {
-    // Clear user session (example: remove token and role from localStorage)
+    setIsModalOpen(true); // Open the modal when logout is clicked
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false); // Close the modal if cancel is clicked
+  };
+
+  const handleConfirmLogout = () => {
+    // Clear session and redirect on confirm
     localStorage.removeItem("userRole");
     localStorage.removeItem("user");
     localStorage.removeItem("token");
-
-    // Redirect to the login page
     router.push("/");
   };
 
-  // Define navigation links based on user role
   const navLinks = {
     customer: [
       { href: "/home", label: "Home" },
@@ -32,18 +38,16 @@ const Header = () => {
     ],
     technician: [
       { href: "/home", label: "Home" },
-      { href: "/profile", label: "Profile" },
+      { href: "/techprofile", label: "Profile" },
     ],
     admin: [
       { href: "/home", label: "Home" },
       { href: "/parts-management", label: "Parts Management" },
       { href: "/orders", label: "Orders" },
       { href: "/users", label: "Users" },
-      // { href: "/settings", label: "Settings" },
     ],
   };
 
-  // If role is not set, return nothing (prevents rendering before user data is fetched)
   if (!role) return null;
 
   return (
@@ -62,6 +66,13 @@ const Header = () => {
           </button>
         </nav>
       </div>
+
+      {/* Modal Component */}
+      <LogoutModal 
+        isOpen={isModalOpen} 
+        onClose={handleCloseModal} 
+        onConfirm={handleConfirmLogout} 
+      />
     </header>
   );
 };

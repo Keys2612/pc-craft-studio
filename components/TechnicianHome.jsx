@@ -3,8 +3,10 @@ import { useState } from "react";
 import TechnicianOrders from "@/components/TechnicianOrders";
 import TechnicianCurrentBuild from "@/components/TechnicianCurrentBuild";
 import TechnicianBuildHistory from "@/components/TechnicianBuildHistory";
+import { useParts } from "@/context/PartsContext"; // Import context
 
 const TechnicianHome = () => {
+  const { currentOrders } = useParts(); // Use context to access currentOrders
   const [selectedTab, setSelectedTab] = useState("Available Orders");
 
   return (
@@ -30,9 +32,10 @@ const TechnicianHome = () => {
 
         {/* Main Content - Switch Component Based on Tab */}
         <main className="flex-1 bg-white shadow-lg p-6">
-          {selectedTab === "Available Orders" && <TechnicianOrders selectedTab={selectedTab} />}
+          {selectedTab === "Available Orders" && (
+            <TechnicianOrders orders={currentOrders} /> // Pass currentOrders as props
+          )}
           {selectedTab === "Current Build" && <TechnicianCurrentBuild />}
-          {/* Placeholder for Build History */}
           {selectedTab === "Build History" && <TechnicianBuildHistory />}
         </main>
       </div>

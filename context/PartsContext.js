@@ -34,24 +34,31 @@ export const PartsProvider = ({ children }) => {
     setSelectedParts((prevParts) => prevParts.filter((part) => part.id !== id));
   };
 
-  // ✅ Confirm Order Function
+  // ✅ Confirm Order Function (Fix)
   const confirmOrder = () => {
     if (selectedParts.length === 0) return;
 
     const newOrder = {
       id: `#${Math.floor(10000 + Math.random() * 90000)}`, // Random order ID
-      parts: selectedParts.map((p) => p.name).join(", "),
+      parts: selectedParts.map((p) => `${p.name} (x${p.quantity})`).join(", "),
       status: "Pending", // Initial status
       action: "Cancel",
     };
 
-    setCurrentOrders((prevOrders) => [newOrder, ...prevOrders]); // Add to orders
+    setCurrentOrders((prevOrders) => [newOrder, ...prevOrders]); // ✅ Adds order to current orders
     setSelectedParts([]); // ✅ Clear cart after confirming
   };
 
   return (
     <PartsContext.Provider
-      value={{ selectedParts, addPart, updateQuantity, removePart, confirmOrder, currentOrders }}
+      value={{
+        selectedParts,
+        addPart,
+        updateQuantity,
+        removePart,
+        confirmOrder,
+        currentOrders, // ✅ Provide orders to CurrentOrders
+      }}
     >
       {children}
     </PartsContext.Provider>

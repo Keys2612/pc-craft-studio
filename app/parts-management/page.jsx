@@ -9,7 +9,7 @@ const initialParts = [
     category: "Graphics Card",
     stock: 10,
     price: 699,
-    image: "https://via.placeholder.com/50", // Placeholder image
+    image: "/images/download.jpeg", // Placeholder image
   },
   {
     id: 2,
@@ -17,7 +17,7 @@ const initialParts = [
     category: "Processor",
     stock: 5,
     price: 599,
-    image: "https://via.placeholder.com/50",
+    image: "/images/download (1).jpeg",
   },
   {
     id: 3,
@@ -25,7 +25,7 @@ const initialParts = [
     category: "RAM",
     stock: 15,
     price: 149,
-    image: "https://via.placeholder.com/50",
+    image: "/images/corsair-ram.jpeg",
   },
 ];
 
@@ -128,7 +128,7 @@ const PartsManagement = () => {
           {filteredParts.map((part) => (
             <tr key={part.id} className="text-center border">
               <td className="p-3 border">
-                <img src={part.image} alt={part.name} className="w-12 h-12 object-cover rounded" />
+                <img src={part.image} alt={part.name} className="w-12 h-12 object-cover rounded mx-auto" />
               </td>
               <td className="p-3 border">{part.name}</td>
               <td className="p-3 border">{part.category}</td>
@@ -229,9 +229,17 @@ const PartsManagement = () => {
             </div>
 
             {/* Modal Buttons */}
-            <button onClick={handleAddPart} className="w-full bg-green-500 text-white py-2 rounded-lg text-lg">
-              Add Part
-            </button>
+            <div className="flex gap-4">
+              <button onClick={handleAddPart} className="w-full bg-green-500 text-white py-2 rounded-lg text-lg">
+                Add Part
+              </button>
+              <button
+                onClick={() => setShowModal(false)} // Close the modal without saving
+                className="w-full bg-gray-500 text-white py-2 rounded-lg text-lg"
+              >
+                Cancel
+              </button>
+            </div>
           </div>
         </div>
       )}

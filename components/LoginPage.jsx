@@ -34,11 +34,11 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="bg-white p-10 rounded-lg shadow-lg w-full max-w-lg">
+      <div className="bg-white p-12 rounded-lg shadow-lg w-full max-w-5xl"> {/* Increased max-width */}
         {/* Logo and Title */}
-        <div className="flex flex-col items-center mb-6">
-          <div className="text-6xl">🛠️🔧</div>
-          <h1 className="text-3xl font-bold text-gray-800 mt-3">PC Craft Studio</h1>
+        <div className="flex items-center justify-center mb-6">
+          <div className="text-6xl mr-4">🛠️</div>
+          <h1 className="text-4xl font-bold text-gray-800">PC Craft Studio</h1>
         </div>
 
         {error && <p className="text-red-500 text-center text-lg mb-4">{error}</p>}
@@ -88,7 +88,11 @@ export default function LoginPage() {
       </div>
 
       {/* Sign-Up Modal */}
-      {isSignUpOpen && <SignUpModal onClose={() => setIsSignUpOpen(false)} />}
+      {isSignUpOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+          <SignUpModal onClose={() => setIsSignUpOpen(false)} />
+        </div>
+      )}
     </div>
   );
 }
