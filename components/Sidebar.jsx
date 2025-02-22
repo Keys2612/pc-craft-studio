@@ -23,7 +23,7 @@ const Sidebar = ({ setCategory, setSelectedBuild }) => {
       return (
         <ul className="space-y-3">
           <li className="font-bold">Categories</li>
-          {["All", "Storage", "Graphics Cards", "Processors", "Memory"].map((category) => (
+          {["All", "Storage", "Graphics Cards", "Processors", "Memory", "Motherborads", "Power Supply", "Cases", "Coolers"].map((category) => (
             <li
               key={category}
               className={`cursor-pointer px-3 py-2 rounded-lg ${

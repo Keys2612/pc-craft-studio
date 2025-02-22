@@ -1,11 +1,20 @@
-import { useParts } from "@/context/PartsContext";
+// File: app/components/BuildSummary.jsx
+"use client";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useParts } from "@/context/PartsContext";
 
 const BuildSummary = () => {
   const { selectedParts, updateQuantity, removePart } = useParts();
   const router = useRouter();
 
+  // Calculate totals
+  const partsTotal = selectedParts.reduce((sum, part) => sum + part.price * part.quantity, 0);
+  const customBuildFee = 20.0;
+  const grandTotal = partsTotal + customBuildFee;
+
   const handleCheckout = () => {
+    // Navigate to the confirm checkout page
     router.push("/my-builds/checkout");
   };
 
@@ -19,7 +28,11 @@ const BuildSummary = () => {
         ) : (
           selectedParts.map((part, index) => (
             <div key={index} className="flex items-center border p-4 mb-4 rounded-lg shadow">
-              <img src={part.imageUrl} alt={part.name} className="w-24 h-24 object-cover rounded" />
+              <img
+                src={part.imageUrl}
+                alt={part.name}
+                className="w-24 h-24 object-cover rounded"
+              />
               <div className="ml-4 flex-1">
                 <h3 className="font-bold">{part.name}</h3>
                 <p>${part.price.toFixed(2)}</p>
@@ -57,16 +70,16 @@ const BuildSummary = () => {
       {/* Summary Section */}
       <div className="w-1/3 p-4 bg-white shadow rounded-lg">
         <h3 className="font-bold text-xl">Summary</h3>
-        <p>
-          Parts Total: $
-          {selectedParts.reduce((sum, part) => sum + part.price * part.quantity, 0).toFixed(2)}
-        </p>
-        <p>Custom Build Fee: $20.00</p>
+        <p>Parts Total: ${partsTotal.toFixed(2)}</p>
+        <p>Custom Build Fee: ${customBuildFee.toFixed(2)}</p>
         <h3 className="font-bold text-lg">
-          Total: $
-          {(selectedParts.reduce((sum, part) => sum + part.price * part.quantity, 20)).toFixed(2)}
+          Total: ${grandTotal.toFixed(2)}
         </h3>
-        <button onClick={handleCheckout} className="mt-4 bg-green-500 text-white px-4 py-2 rounded w-full">
+
+        <button
+          onClick={handleCheckout}
+          className="mt-4 bg-green-500 text-white px-4 py-2 rounded w-full"
+        >
           Proceed to Checkout
         </button>
       </div>

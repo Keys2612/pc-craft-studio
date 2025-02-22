@@ -1,10 +1,9 @@
 {
   "development": {
-    "url": "postgres://admin:password@localhost:5432/pc_craft_studio",
-    "dialect": "postgres",
-    "password": "password",
     "username": "admin",
+    "password": "password",
     "database": "pc_craft_studio",
-    "host": "localhost"
+    "host": "localhost",
+    "dialect": "postgres"
   }
 }
