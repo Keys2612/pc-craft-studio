@@ -9,7 +9,7 @@ const initialParts = [
     category: "Graphics Card",
     stock: 10,
     price: 699,
-    image: "/images/download.jpeg", // Placeholder image
+    image: "/images/download.jpeg",
   },
   {
     id: 2,
@@ -37,6 +37,7 @@ const PartsManagement = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("All");
   const [showModal, setShowModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
   const [newPart, setNewPart] = useState({
     name: "",
     category: "",
@@ -44,73 +45,76 @@ const PartsManagement = () => {
     price: "",
     image: "",
   });
-
-  // Filter parts by category and search query
-  const filteredParts = parts.filter(
-    (part) =>
-      (categoryFilter === "All" || part.category === categoryFilter) &&
-      part.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const [editPart, setEditPart] = useState(null);
 
   // Handle image upload
-  const handleImageUpload = (e) => {
+  const handleImageUpload = (e, setPart) => {
     const file = e.target.files[0];
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setNewPart({ ...newPart, image: reader.result });
+        setPart((prev) => ({ ...prev, image: reader.result }));
       };
       reader.readAsDataURL(file);
     }
   };
 
+  // Handle editing a part
+  const handleEditPart = () => {
+    setParts(parts.map((p) => (p.id === editPart.id ? editPart : p)));
+    setShowEditModal(false);
+    setEditPart(null);
+  };
+
   // Handle adding a new part
   const handleAddPart = () => {
-    if (!newPart.name || !newPart.category || !newPart.stock || !newPart.price) {
-      alert("Please fill all fields!");
-      return;
-    }
-
-    const newPartData = {
-      id: parts.length + 1,
-      ...newPart,
-    };
-
-    setParts([...parts, newPartData]);
+    const newId = parts.length + 1;
+    setParts([...parts, { ...newPart, id: newId }]);
     setShowModal(false);
-    setNewPart({ name: "", category: "", stock: "", price: "", image: "" });
+    setNewPart({
+      name: "",
+      category: "",
+      stock: "",
+      price: "",
+      image: "",
+    });
   };
+
+  // Filter parts based on category and search query
+  const filteredParts = parts.filter((part) => {
+    const matchesCategory =
+      categoryFilter === "All" || part.category === categoryFilter;
+    const matchesSearch =
+      part.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      part.category.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesCategory && matchesSearch;
+  });
 
   return (
     <div className="p-6">
       <h1 className="text-3xl font-bold mb-4">Parts Management</h1>
 
-      {/* Filters & Search */}
-      <div className="flex items-center gap-4 mb-4">
-        {/* Category Filter */}
-        <div>
-          <label className="mr-2 font-semibold">Filter by Category:</label>
-          <select
-            value={categoryFilter}
-            onChange={(e) => setCategoryFilter(e.target.value)}
-            className="p-2 border rounded"
-          >
-            {categories.map((cat) => (
-              <option key={cat} value={cat}>
-                {cat}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {/* Search Box */}
+      {/* Filter and Search */}
+      <div className="mb-4 flex gap-4">
         <input
           type="text"
-          placeholder="Search parts..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="p-2 border rounded w-64"
+          className="p-2 border rounded"
+          placeholder="Search parts..."
         />
+        <select
+          value={categoryFilter}
+          onChange={(e) => setCategoryFilter(e.target.value)}
+          className="p-2 border rounded"
+        >
+          <option value="All">All Categories</option>
+          {categories.slice(1).map((cat) => (
+            <option key={cat} value={cat}>
+              {cat}
+            </option>
+          ))}
+        </select>
       </div>
 
       {/* Parts Table */}
@@ -122,18 +126,34 @@ const PartsManagement = () => {
             <th className="p-3 border">Category</th>
             <th className="p-3 border">Stock</th>
             <th className="p-3 border">Price</th>
+            <th className="p-3 border">Actions</th>
           </tr>
         </thead>
         <tbody>
           {filteredParts.map((part) => (
             <tr key={part.id} className="text-center border">
               <td className="p-3 border">
-                <img src={part.image} alt={part.name} className="w-12 h-12 object-cover rounded mx-auto" />
+                <img
+                  src={part.image}
+                  alt={part.name}
+                  className="w-12 h-12 object-cover rounded mx-auto"
+                />
               </td>
               <td className="p-3 border">{part.name}</td>
               <td className="p-3 border">{part.category}</td>
               <td className="p-3 border">{part.stock}</td>
               <td className="p-3 border">${part.price}</td>
+              <td className="p-3 border">
+                <button
+                  onClick={() => {
+                    setEditPart(part);
+                    setShowEditModal(true);
+                  }}
+                  className="bg-yellow-500 text-white px-4 py-2 rounded"
+                >
+                  Edit
+                </button>
+              </td>
             </tr>
           ))}
         </tbody>
@@ -147,7 +167,7 @@ const PartsManagement = () => {
         Add Part
       </button>
 
-      {/* Modal */}
+      {/* Add Part Modal */}
       {showModal && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-white p-6 rounded-lg shadow-lg w-96 text-center">
@@ -173,7 +193,7 @@ const PartsManagement = () => {
                 id="fileInput"
                 type="file"
                 accept="image/*"
-                onChange={handleImageUpload}
+                onChange={(e) => handleImageUpload(e, setNewPart)}
                 className="hidden"
               />
             </div>
@@ -230,11 +250,111 @@ const PartsManagement = () => {
 
             {/* Modal Buttons */}
             <div className="flex gap-4">
-              <button onClick={handleAddPart} className="w-full bg-green-500 text-white py-2 rounded-lg text-lg">
+              <button
+                onClick={handleAddPart}
+                className="w-full bg-green-500 text-white py-2 rounded-lg text-lg"
+              >
                 Add Part
               </button>
               <button
-                onClick={() => setShowModal(false)} // Close the modal without saving
+                onClick={() => setShowModal(false)}
+                className="w-full bg-gray-500 text-white py-2 rounded-lg text-lg"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Modal */}
+      {showEditModal && editPart && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-96 text-center">
+            <h2 className="text-2xl font-bold mb-6">Edit Part</h2>
+
+            {/* Upload Image */}
+            <div className="mb-4 text-left">
+              <label className="block font-semibold">Upload Image</label>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => handleImageUpload(e, setEditPart)}
+                className="w-full p-2 border rounded"
+              />
+            </div>
+
+            {/* Part Name */}
+            <div className="mb-4 text-left">
+              <label className="block font-semibold">Part Name</label>
+              <input
+                type="text"
+                value={editPart.name}
+                onChange={(e) =>
+                  setEditPart({ ...editPart, name: e.target.value })
+                }
+                className="w-full p-2 border rounded"
+                placeholder="Enter part name"
+              />
+            </div>
+
+            {/* Category */}
+            <div className="mb-4 text-left">
+              <label className="block font-semibold">Category</label>
+              <select
+                value={editPart.category}
+                onChange={(e) =>
+                  setEditPart({ ...editPart, category: e.target.value })
+                }
+                className="w-full p-2 border rounded"
+              >
+                <option value="">Select Category</option>
+                {categories.slice(1).map((cat) => (
+                  <option key={cat} value={cat}>
+                    {cat}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Stock */}
+            <div className="mb-4 text-left">
+              <label className="block font-semibold">Stock</label>
+              <input
+                type="number"
+                value={editPart.stock}
+                onChange={(e) =>
+                  setEditPart({ ...editPart, stock: e.target.value })
+                }
+                className="w-full p-2 border rounded"
+                placeholder="Enter stock quantity"
+              />
+            </div>
+
+            {/* Price */}
+            <div className="mb-4 text-left">
+              <label className="block font-semibold">Price</label>
+              <input
+                type="number"
+                value={editPart.price}
+                onChange={(e) =>
+                  setEditPart({ ...editPart, price: e.target.value })
+                }
+                className="w-full p-2 border rounded"
+                placeholder="Enter price"
+              />
+            </div>
+
+            {/* Modal Buttons */}
+            <div className="flex gap-4">
+              <button
+                onClick={handleEditPart}
+                className="w-full bg-green-500 text-white py-2 rounded-lg text-lg"
+              >
+                Save Changes
+              </button>
+              <button
+                onClick={() => setShowEditModal(false)}
                 className="w-full bg-gray-500 text-white py-2 rounded-lg text-lg"
               >
                 Cancel
