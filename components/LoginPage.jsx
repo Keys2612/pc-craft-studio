@@ -1,3 +1,4 @@
+// File: app/LoginPage.jsx
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -10,31 +11,48 @@ export default function LoginPage() {
   const [isSignUpOpen, setIsSignUpOpen] = useState(false);
   const router = useRouter();
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    setError(""); // Clear previous errors
+    setError("");
 
     if (!username || !password) {
       setError("Please enter a username and password.");
       return;
     }
 
-    let role = "";
-    if (username.startsWith("customer")) role = "customer";
-    else if (username.startsWith("tech")) role = "technician";
-    else if (username.startsWith("admin")) role = "admin";
-    else {
-      setError("Invalid username or password.");
-      return;
-    }
+    try {
+      // Call the backend authentication endpoint
+      const res = await fetch("http://localhost:5000/api/users/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ username, password })
+      });
 
-    localStorage.setItem("userRole", role);
-    router.push("/home");
+      const data = await res.json();
+
+      if (!res.ok) {
+        // Display error message returned by the backend
+        setError(data.message || "Login failed.");
+        return;
+      }
+
+      // Save token and user role to localStorage
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("userRole", data.user.role);
+
+      // Redirect to the home page (adjust as needed)
+      router.push("/home");
+    } catch (error) {
+      console.error("Error during login:", error);
+      setError("An error occurred. Please try again.");
+    }
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="bg-white p-12 rounded-lg shadow-lg w-full max-w-5xl"> {/* Increased max-width */}
+      <div className="bg-white p-12 rounded-lg shadow-lg w-full max-w-5xl">
         {/* Logo and Title */}
         <div className="flex items-center justify-center mb-6">
           <div className="text-6xl mr-4">🛠️</div>
@@ -52,7 +70,8 @@ export default function LoginPage() {
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               required
-              className="mt-2 block w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-lg"
+              className="mt-2 block w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm 
+                         focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-lg"
             />
           </div>
           <div>
@@ -62,13 +81,15 @@ export default function LoginPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="mt-2 block w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-lg"
+              className="mt-2 block w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm 
+                         focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-lg"
             />
           </div>
           <div>
             <button
               type="submit"
-              className="w-full py-3 px-4 text-lg rounded-md shadow-md text-white bg-indigo-600 hover:bg-indigo-700 transition"
+              className="w-full py-3 px-4 text-lg rounded-md shadow-md text-white 
+                         bg-indigo-600 hover:bg-indigo-700 transition"
             >
               Login
             </button>
