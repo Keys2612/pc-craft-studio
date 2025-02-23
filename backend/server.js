@@ -5,6 +5,9 @@ const cors = require("cors");
 const pool = require("./db");
 const partsRoutes = require("./routes/parts");
 const usersRoutes = require("./routes/users");
+// File: backend/server.js
+const ordersRoutes = require("./routes/orders");
+
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -26,6 +29,7 @@ app.get("/api/test-db", async (req, res) => {
 // Mount routes
 app.use("/api/parts", partsRoutes);
 app.use("/api/users", usersRoutes);
+app.use("/api/orders", ordersRoutes);
 
 app.get("/", (req, res) => {
   res.send("API is running!");

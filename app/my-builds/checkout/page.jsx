@@ -1,12 +1,14 @@
+// File: app/my-builds/checkout/page.jsx (example)
 "use client";
 import { useEffect } from "react";
-import { useParts } from "@/context/PartsContext";
 import { useRouter } from "next/navigation";
+import { useParts } from "@/context/PartsContext";
 
-const Checkout = () => {
-  const { selectedParts, confirmOrder } = useParts();
+export default function Checkout() {
+  const { selectedParts } = useParts();
   const router = useRouter();
 
+  // If no parts, redirect back
   useEffect(() => {
     if (selectedParts.length === 0) {
       router.push("/my-builds");
@@ -19,15 +21,32 @@ const Checkout = () => {
   const customBuildFee = 20;
   const totalPrice = partsTotal + customBuildFee;
 
-  const handleConfirmOrder = () => {
-    confirmOrder();
-    router.push("/my-builds"); // Redirect after confirming
+  const handleConfirmOrder = async () => {
+    try {
+      const response = await fetch("http://localhost:5000/api/orders", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          parts: selectedParts,
+          partsTotal,
+          customBuildFee,
+          grandTotal: totalPrice,
+        }),
+      });
+      if (!response.ok) {
+        throw new Error("Failed to create order");
+      }
+
+      // On success, redirect to Current Orders tab
+      router.push("/my-builds");
+    } catch (err) {
+      console.error("Error creating order:", err);
+    }
   };
 
   return (
     <div className="max-w-4xl mx-auto p-6">
       <h2 className="text-2xl font-bold mb-4">Checkout</h2>
-
       <div className="bg-white p-6 shadow rounded-lg">
         <h3 className="font-bold text-xl mb-3">Order Summary</h3>
         {selectedParts.map((part) => (
@@ -41,13 +60,11 @@ const Checkout = () => {
             </div>
           </div>
         ))}
-
         <div className="mt-4 border-t pt-4">
           <p>Parts Total: <strong>${partsTotal.toFixed(2)}</strong></p>
           <p>Custom Build Fee: <strong>${customBuildFee.toFixed(2)}</strong></p>
           <h3 className="font-bold text-xl mt-2">Total: ${totalPrice.toFixed(2)}</h3>
         </div>
-
         <button 
           onClick={handleConfirmOrder} 
           className="mt-6 w-full bg-blue-500 text-white py-2 rounded-lg font-bold text-lg"
@@ -57,6 +74,4 @@ const Checkout = () => {
       </div>
     </div>
   );
-};
-
-export default Checkout;
+}
